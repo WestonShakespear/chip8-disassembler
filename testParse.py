@@ -17,31 +17,71 @@ def readFileContents(filename):
             data[coderaw] = {'r': reg, 'c': d[1], 'i': d[2]}
     return data
 
+def readBinData(filename):
+    hexData = []
+    with open(filename, "rb") as f:
+        while (byte := f.read(1)):
+            hexData.append(byte.hex().upper())
 
-d = readFileContents("opcodes.csv")
+    return hexData
 
-for a in d:
-    print(a, d[a])
+def parseCode(codeList, opcode):
+    if opcode in codeList:
+            return '~' + codeList[opcode]['i']
+    else:
+        for code in codeList:
+            if (re.match(codeList[code]['r'], opcode)):
+                return codeList[code]['i']
+    return '*'
+
+
+def disAssemble(codeList, binData):
+    for byteC in range(0, len(binData), 2):
+        opcode = binData[byteC] + binData[byteC + 1]
+
+        info = parseCode(codeList, opcode)
+
+        print('B:', str(byteC).zfill(3), ' OP:', opcode, '   ', info)
+        
+
+
+
+codeList = readFileContents("opcodes.csv")
+binData = readBinData("IBM Logo.ch8")
+
+#list opcodes
+for a in codeList:
+    print(a, codeList[a])
 print(end='\n\n')
-with open("IBM Logo.ch8", "rb") as f:
-    while (byte := f.read(2)):
-        opcode = byte.hex().upper()
 
-        print(opcode, end=' - ')
-        if opcode in d:
-            print('~' + d[opcode]['i'], end='')
-        else:
-            for code in d:
-                if (re.match(d[code]['r'], opcode)):
-                    print(d[code]['i'], end='')
-        #check full
-        # if opcode in d:
-        #     print('~' + d[opcode]['i'])
-        # else:
-        #     #check re
+#list bindata
+for i,a in enumerate(binData):
+    print(i, a)
+
+
+#disassemble
+disAssemble(codeList, binData)
+
+
+# with open(, "rb") as f:
+#     while (byte := f.read(2)):
+#         opcode = byte.hex().upper()
+
+#         print(opcode, end=' - ')
+#         if opcode in d:
+#             print('~' + d[opcode]['i'], end='')
+#         else:
+#             for code in d:
+#                 if (re.match(d[code]['r'], opcode)):
+#                     print(d[code]['i'], end='')
+#         #check full
+#         # if opcode in d:
+#         #     print('~' + d[opcode]['i'])
+#         # else:
+#         #     #check re
             
-        #     for code in d:
-        #         if (re.match(d[code]['r'], opcode)):
-        #             print(d[opcode]['i'])
+#         #     for code in d:
+#         #         if (re.match(d[code]['r'], opcode)):
+#         #             print(d[opcode]['i'])
 
-        print()
+#         print()
